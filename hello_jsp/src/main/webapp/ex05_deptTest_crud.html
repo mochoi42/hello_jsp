@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="jquery-3.7.1.min.js"></script>
+<script>
+	$(function(){
+		//미래에 만들어지는 노드 즉, 동적으로 생성된 노드는 부모에 이벤트를 걸어야한다.
+		//다음과 같이 직접 걸 경우 먹지 않는다
+		
+		$("tr").click(function(){
+			//alert("되는지 확인");
+		});
+
+		//다음과 같이 원래부터 있는 부모노드에 이벤트를 연결해야 한다.
+		//document.on("click", "tr", function(){}); --> thead 도 먹어버림
+		//행을 누르면 입력상자에 자동으로 값이 넣어짐
+		$("#output").on("click", "tr", function(){
+			let tds = $(this).find("td");
+			
+			
+			
+			$("#dno").val($(tds[0]).html());
+			$("#dname").val($(tds[1]).html());
+			$("#dloc").val($(tds[2]).html());
+
+			$("#output tr").removeClass("active");
+			$(this).addClass("active");
+		});
+
+		$("#output").on("mouseover", "tr", function(){
+			$(this).addClass("high_light");
+		});
+		$("#output").on("mouseleave", "tr", function(){
+			$(this).removeClass("high_light");
+		});
+		
+
+
+		let loadDept = function(){
+			$.ajax({
+				url : "listDept_json2.jsp",
+			    success:function(data){
+			    	$("#output").empty();
+			    	
+			    	$.each(data, function(i, dept){let tr = $("<tr></tr>");
+		    			let td1 = $("<td></td>").html(dept.dno);
+		    			let td2 = $("<td></td>").html(dept.dname);
+		    			let td3 = $("<td></td>").html(dept.dloc);
+		    			$(tr).append(td1, td2, td3);
+						$("#output").append(tr);
+			    	});
+			    }
+			});
+		}
+		
+		//등록 버튼이 눌러지면 데이터 등록
+		$("#btnAdd").click(function(e){
+			let dno = $("#dno").val();
+			let dname = $("#dname").val();
+			let dloc = $("#dloc").val();
+			
+			//속성명 : 속성값(아래는 변수)
+			let item = {dno:dno, dname:dname, dloc:dloc};
+			
+			$.ajax({
+				url: "insertDept.jsp",
+				data:item,
+				success:function(r){
+					if(r.msg == "1"){
+						loadDept();
+					}
+				}
+			});
+
+			//기본 이벤트 제거
+			e.preventDefault();
+		});
+
+		//수정 버튼이 눌러지면 데이터 수정
+		$("#btnUpdate").click(function(e){
+			let dno = $("#dno").val();
+			let dname = $("#dname").val();
+			let dloc = $("#dloc").val();
+			
+			//속성명 : 속성값(아래는 변수)
+			let item = {dno:dno, dname:dname, dloc:dloc};
+			
+			$.ajax({
+				url: "updateDept.jsp",
+				data:item,
+				success:function(r){
+					if(r.msg == "1"){
+						loadDept();
+					}
+				}
+			});
+
+			//기본 이벤트 제거
+			e.preventDefault();
+		});
+
+		//삭제 버튼이 눌러지면 데이터 삭제
+		$("#btnDelete").click(function(e){
+			if(confirm("정말 삭제?") == false){
+				e.preventDefault();
+				return false;
+			}
+			
+			let dno = $("#dno").val();
+			
+			//속성명 : 속성값(아래는 변수)
+			let item = {dno:dno};
+			
+			$.ajax({
+				url: "deleteDept.jsp",
+				data:item,
+				success:function(r){
+					if(r.msg == "1"){
+						loadDept();
+					}
+				}
+			});
+
+			//기본 이벤트 제거
+			e.preventDefault();
+		});
+
+		loadDept();
+	})
+</script>
+<style>
+    table{
+        border:1px solid #ddd;
+        border-spacing: 0;
+        border-collapse: collapse;
+    }
+    table td{
+        border:1px solid #ddd;
+    }
+	
+	.high_light{
+		background: pink;
+	}
+	.active{
+		background: rebeccapurple;
+		color:#fff;
+	}
+</style>
+</head>
+<body>
+    <h1>Hello Kosta</h1>
+    <hr>
+    <table width="80%">
+		<thead>
+			<tr>
+				<th>부서번호</th>
+				<th>부서이름</th>
+				<th>부서위치</th>
+			</tr>
+		</thead>
+		<tbody id="output">
+
+		</tbody>
+	</table>
+	<hr>
+    <form id="my_form" action="#">
+		<table>
+			<tr>
+				<td>부서번호</td>
+				<td><input type="text" id="dno"></td>
+			</tr>
+			<tr>
+				<td>부서명</td>
+				<td><input type="text" id="dname"></td>
+			</tr>
+			<tr>
+				<td>부서위치</td>
+				<td><input type="text" id="dloc"></td>
+			</tr>
+		</table>
+	</form>
+	<input id="btnAdd" type="button" value="등록">
+	<input id="btnUpdate" type="button" value="수정">
+	<input id="btnDelete" type="button" value="삭제">
+</body>
+</html> 

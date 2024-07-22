@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script>
+    window.onload = function(){
+        document.querySelector("#btnRead").onclick=function(){
+            let request = new XMLHttpRequest();
+            //동기 방식의 get방식으로 jsp
+            // 서버로부터 데이터가 올 때까지 아무것도 하지 않겠다. 
+            //textarea를 쓰다가 버튼을 누르면 먹통됨.
+            request.open("get", "listDept_json.jsp", false);
+            request.send();
+            //문자에 담겨져 오므로 객체를 생성하여for문 등의 수행을 작업한다.
+            let arr = eval("("+request.responseText+")");
+            let table = document.createElement("table");
+            for(let i=0;i<arr.length;i++){
+                let tr = document.createElement("tr");
+                let td1 = document.createElement("td");
+                let td2 = document.createElement("td");
+                let td3 = document.createElement("td");
+                let txt1 = document.createTextNode(arr[i].dno);
+                let txt2 = document.createTextNode(arr[i].dname);
+                let txt3 = document.createTextNode(arr[i].dloc);
+
+                td1.appendChild(txt1);
+                td2.appendChild(txt2);
+                td3.appendChild(txt3);
+
+                tr.appendChild(td1);
+                tr.appendChild(td2);
+                tr.appendChild(td3);
+
+                table.appendChild(tr);
+            }
+            document.querySelector("#output").appendChild(table);
+        }
+    }
+</script>
+<style>
+    table{
+        border:1px solid #ddd;
+        border-spacing: 0;
+        border-collapse: separate;
+    }
+    table td{
+        border:1px solid #ddd;
+    }
+</style>
+</head>
+<body>
+    <textarea name="" id=""></textarea>
+    <hr>
+    <h1>Hello Kosta</h1>
+    <button id="btnRead">Ajax 통신</button>
+    <hr>
+    <div id="output"></div>
+    <h1>Hello Kosta</h1>
+</body>
+</html>
